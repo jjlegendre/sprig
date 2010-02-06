@@ -8,14 +8,25 @@ class Sprig_Field_BelongsTo extends Sprig_Field_ForeignKey {
 	{
 		$model = Sprig::factory($this->model);
 
-		$choices = $model->select_list($model->pk());
-
-		if ($this->empty)
+		if (is_array ($this->choices))
 		{
-			Arr::unshift($choices, '', '-- '.__('None'));
+			$choices = $this->choices ;
+		}
+		else
+		{
+			$choices = $model->select_list($model->pk());
 		}
 
-		return Form::select($name, $choices, $this->verbose($value), $attr);
+		/*
+			Removed the None default option.  This is an undesirable default for a foreign key.
+			It is better managed by the user as part of a custom choices list.
+		*/
+
+		/* 
+			Note: Updated to provide selected value as $this->value rather than $this->verbose 
+			which was returning the description rathern than the value when a match was found in choices.
+		*/
+		return Form::select($name, $choices, $this->value($value), $attr);
 	}
 
 } // End Sprig_Field_BelongsTo
